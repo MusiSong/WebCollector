@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	
+	<!-- 不拦截静态资源 -->
+	<mvc:resources location="/static/css/**" mapping="/static/css/"/>
+	<mvc:resources location="/static/image/**" mapping="/static/image/"/>
+	<mvc:resources location="/static/js/**" mapping="/static/js/"/>
+	<!-- 自动扫描controller -->
+	<context:component-scan base-package="com.Music.web"/>
+	<!-- 避免IE执行ajax时，返回JSON出现下载文件 -->
+	<bean id="propertyConfiguer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:Music.properties"></property>
+	</bean>
+	<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 定义跳转的文件前后缀，视图 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 配置文件上传 -->
+	<bean id="commonsMultipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 默认编码 -->
+		<property name="defaultEncoding" value="utf-8"></property>
+		<!-- 最大上传文件大小 -->
+		<property name="maxUploadSize" value="10485760000"/>
+		<!-- 内存中最大值 -->
+		<property name="maxInMemorySize" value="40960"></property>
+	</bean>
+	<!-- redis连接池配置 ，【不能实用到真正的生产环境】-->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="${redis.maxIdle}"/><!-- 最大连接数 -->
+		<property name="numTestsPerEvictionRun" value="${redis.numTestsPerEvictionRun}"/><!-- 每次扫描对象的最大数量 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${redis.timeBetweenEvictionRunsMillis}"/><!-- 表示对象扫描时间间隔 -->
+		<property name="maxWait" value="${redis.maxWait}"/><!-- 获取jedis连接的最大等待时间 -->
+		<property name="testOnReturn" value="${redis.testOnReturn}"/><!-- 是否提前进行校验 -->
+		<property name="testOnBorrow" value="${redis.testOnBorrow}"/><!-- 获取jedis实例前进行校验连接 -->
+		<property name="maxActive" value="${redis.maxActive}"/><!-- 最多分配多少个实例 -->
+	</bean>
+	<!-- 配置redis集群操作，单连接操作用redis.clients.jedis.JedisPoolConfig配置和这个差不多-->
+	<!-- 此集群配置是通过对象的hash值获取要存放的某台服务器 （客户端配置）-->
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool" destroy-method="destroy">
+		<constructor-arg ref="jedisPoolConfig"></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg value="${redis.host}"/><!-- 主机 -->
+					<constructor-arg value="${redis.port}"/><!-- 端口 -->
+					<constructor-arg value="${redis.alias_port}"/><!-- 端口别名 -->
+				</bean>
+				<!-- 多台服务器按此方法类推
+				<bean class="redis.clients.jedis.JedisShardInfo">
+					<constructor-arg value="${redis.host}"/>
+					<constructor-arg value="${redis.port}"/>
+					<constructor-arg value="${redis.alias_port}"/>
+				</bean> -->
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- webServices配置 -->
+	
+	
+	<!-- log4j配置 -->
+	
+	
+	<!-- MQ配置 -->
+	
+	
+	<!-- 拦截器配置 -->
+	
+	
+	
+	<!-- 安全配置 -->
+	
+	
+</beans>

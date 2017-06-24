@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "log4j.dtd">
+<log4j:configuration>
+	<!-- 控制台输出 -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="encoding" value="GBK"/>
+		<param name="target" value="System.out"/><!-- 要输出到控制台 -->
+		<layout class="org.apache.log4j.PatternLayout"><!-- 自定义格式输出日志 -->
+			<param name="ConversionPattern" value="%d{ISO8601} 耗时：%r [日志来自：%-40.40c{3} 日志类型: %-5p 日志内容：%m]%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="debug"/>
+			<param name="levelMax" value="ERROR"/>
+			<param name="AcceptOnMatch" value="true"/><!-- 为了匹配这个级别 -->
+		</filter>
+	</appender>
+	<!-- [公共的]输人到文件按日期生成新的文件 -->
+	<appender name="DEFAULT-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+	 <param name="File" value="D\:/logs/Music.log" />
+		<param name="Append" value="true" />  <!-- 是否项目重启继续保存之前日志 -->
+     	<param name="encoding" value="GBK" />  
+     	<param name="threshold" value="all" /> <!-- 记录所有类型日志，记录它和比它等级高的日志all<debug -->
+     	<layout class="org.apache.log4j.PatternLayout">  <!-- 输出方式 -->
+    	<param name="ConversionPattern" value="%d{ISO8601} 耗时：%r [日志来自：%-40.40c{3} 日志类型: %-5p 日志内容：%m]%n" />  
+     </layout>  
+	</appender>
+   <root> 
+       <level value="ALL"></level>  <!-- 限定记录等级 -->
+       <appender-ref ref="DEFAULT-APPENDER" />  <!-- 调用记录方式 -->
+       <appender-ref ref="console"/>
+   </root> 
+</log4j:configuration>
